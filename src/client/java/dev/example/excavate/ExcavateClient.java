@@ -103,6 +103,6 @@ public final class ExcavateClient implements ClientModInitializer {
     }
     private void tell(String text) {
         var p = Minecraft.getInstance().player;
-        if (p != null) p.displayClientMessage(Component.literal("[Excavate] " + text), false);
+        if (p != null) p.sendSystemMessage(Component.literal("[Excavate] " + text));
     }
 }
