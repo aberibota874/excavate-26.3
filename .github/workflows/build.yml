@@ -1,0 +1,54 @@
+name: Build Minecraft 26.3 Fabric Mod
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+
+      - name: Set up Gradle 9.7.1
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.7.1'
+          cache-read-only: ${{ github.event_name == 'pull_request' }}
+
+      - name: Download verified official Baritone API v1.20.0
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p libs
+          curl --fail --location --retry 3 --retry-all-errors \
+            'https://github.com/cabaletta/baritone/releases/download/v1.20.0/baritone-api-1.20.0.jar' \
+            --output libs/baritone-api-1.20.0.jar
+          echo '6044d08949f4bf75c24e3b513207a31e476c965a8f12e6f16b75b5bf7f8351d7  libs/baritone-api-1.20.0.jar' | sha256sum --check
+
+      - name: Compile and remap Fabric mod
+        run: gradle --no-daemon clean build --stacktrace
+
+      - name: Upload remapped, deployable mod JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: excavate-26.3-fabric-${{ github.run_number }}
+          path: |
+            build/libs/excavate-*.jar
+            !build/libs/*-sources.jar
+            !build/libs/*-dev.jar
+          if-no-files-found: error
+          retention-days: 30
