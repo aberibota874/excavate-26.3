@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "id": "excavate",
   "version": "${version}",
-  "name": "Excavate Controller (Prototype)",
-  "description": "Client-side region excavation and inventory-triggered storage navigation prototype",
+  "name": "Excavate Controller",
+  "description": "Client-side area mining and automated chest/shulker resource unloading",
   "environment": "client",
   "entrypoints": {
     "client": ["dev.example.excavate.ExcavateClient"]
